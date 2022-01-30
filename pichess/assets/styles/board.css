@@ -1,0 +1,22 @@
+QFrame[color = 'light-square'] {
+    background-color: #f0d9b5;
+}
+
+QFrame[color = 'dark-square'] {
+    background-color: #b58863;
+}
+
+QFrame[type = 'dot'] {
+    background-color: #333;
+    border-radius: 15px;
+}
+
+QFrame[type = 'corner'] {
+    border: 20px solid #333;
+    border-radius: 40px;
+}
+
+QFrame[type = 'coordinates'] {
+    color: #444;
+    font-size: 44px;
+}
