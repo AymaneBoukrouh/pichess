@@ -1,5 +1,5 @@
 def fen_to_matrix(fen: str) -> dict[str, str]:
-    """convert fen to matrix"""
+    '''convert fen to matrix'''
 
     matrix = {
         f'{chr(ord("a")+x)}{y+1}': None

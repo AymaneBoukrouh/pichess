@@ -20,7 +20,7 @@ class Piece(QSvgWidget):
 
     @staticmethod
     def from_letter(letter, coordinates, parent, shadow=False) -> Piece:
-        """initiate piece from letter, returns appropriate piece object"""
+        '''initiate piece from letter, returns appropriate piece object'''
 
         color = ('A' <= letter <= 'Z') # True -> white, False -> black
 
@@ -35,7 +35,7 @@ class Piece(QSvgWidget):
         return PieceType(coordinates, color, parent, shadow)
 
     def set_coordinates(self, coordinates: str) -> None:
-        """set coordinates and move piece to the appropriate square"""
+        '''set coordinates and move piece to the appropriate square'''
 
         self.setObjectName(coordinates)
         self.coordinates = coordinates
@@ -46,7 +46,7 @@ class Piece(QSvgWidget):
 
     
     def mousePressEvent(self, event):
-        """move the clicked piece right under the mouse cusor and create shadow"""
+        '''move the clicked piece right under the mouse cusor and create shadow'''
 
         self.move_under_mouse(event)
         self.show_shadow() # dislay a shadow to mark original position when moving the piece
@@ -54,20 +54,20 @@ class Piece(QSvgWidget):
         self.highlight_move()
 
     def mouseMoveEvent(self, event):
-        """keep the clicked piece right under the mouse cursor"""
+        '''keep the clicked piece right under the mouse cursor'''
 
         self.move_under_mouse(event)
         self.highlight_move()
     
     def mouseReleaseEvent(self, event):
-        """change position of piece if it is valid and hide shadow"""
+        '''change position of piece if it is valid and hide shadow'''
 
         self.set_coordinates(self.current_coordinates)
         self.hide_shadow()
         self.highlighted_square.clear_highlight()
 
     def move_under_mouse(self, event) -> None:
-        """move piece right under the mouse cursor"""
+        '''move piece right under the mouse cursor'''
 
         mouse_pos = self.mapTo(self.board, event.position())
         x, y = map(int, (mouse_pos.x(), mouse_pos.y()))
@@ -82,14 +82,14 @@ class Piece(QSvgWidget):
 
 
     def make_shadow(self) -> None:
-        """add transparency effect to the piece"""
+        '''add transparency effect to the piece'''
 
         opacity = QGraphicsOpacityEffect()
         opacity.setOpacity(.3)
         self.setGraphicsEffect(opacity)
     
     def show_shadow(self) -> None:
-        """create a shadow piece of same type in the square with current coordinates of the piece"""
+        '''create a shadow piece of same type in the square with current coordinates of the piece'''
 
         self.shadow = Piece.from_letter(
             self.letter,
@@ -102,13 +102,13 @@ class Piece(QSvgWidget):
         self.shadow.show()
     
     def hide_shadow(self) -> None:
-        """destroy shadow piece"""
+        '''destroy shadow piece'''
 
         self.shadow.setParent(None)
         del self.shadow
 
     def highlight_move(self) -> None:
-        """highlight the square that the piece in on"""
+        '''highlight the square that the piece in on'''
 
         try:
             self.highlighted_square.clear_highlight()
@@ -119,7 +119,7 @@ class Piece(QSvgWidget):
         self.highlighted_square = self.current_square
 
     def appear_on_top(self) -> None:
-        """make all pieces stacked under current piece"""
+        '''make all pieces stacked under current piece'''
 
         for piece in self.board.pieces:
             if piece is not self:
@@ -127,7 +127,7 @@ class Piece(QSvgWidget):
 
     @property
     def current_coordinates(self) -> str:
-        """calculate coordinates from current position"""
+        '''calculate coordinates from current position'''
 
         pos = self.pos()
         width = height = self.size().width()
@@ -141,7 +141,7 @@ class Piece(QSvgWidget):
 
     @property
     def current_square(self) -> Square:
-        """get square from current coordinates"""
+        '''get square from current coordinates'''
 
         return self.board.get_square_by_coordinates(self.current_coordinates)
 

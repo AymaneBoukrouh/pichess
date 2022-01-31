@@ -21,14 +21,14 @@ class Board(QWidget):
         self.set_fen_position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
 
     def set_squares(self) -> None:
-        """create 64 (8x8) squares on the board"""
+        '''create 64 (8x8) squares on the board'''
 
         for x in range(8):
             for y in range(8):
                 Square(x, y, self)
 
     def set_fen_position(self, fen: str) -> None:
-        """set position from fen string"""
+        '''set position from fen string'''
 
         for piece in self.pieces:
             piece.setParent(None)
@@ -43,22 +43,22 @@ class Board(QWidget):
 
     @property
     def pieces(self) -> list[Piece]:
-        """return all pieces on the board as a list"""
+        '''return all pieces on the board as a list'''
 
         return self.findChildren(Piece)
 
     def get_piece_by_coordinates(self, coordinates: str) -> Piece:
-        """return piece with specified coordinates"""
+        '''return piece with specified coordinates'''
 
         return self.findChild(Piece, coordinates)
     
     @property
     def squares(self) -> list[Square]:
-        """return all squares of the board as a list"""
+        '''return all squares of the board as a list'''
 
         return self.findChildren(Square)
 
     def get_square_by_coordinates(self, coordinates: str) -> Square:
-        """return square with specified coordinates"""
+        '''return square with specified coordinates'''
 
         return self.findChild(Square, coordinates)
