@@ -59,7 +59,7 @@ class TestPawn(TestCase):
         )
 
         self.assertEqual(
-            Pawn('f8', True).possible,
+            Pawn('f8', True).possible_capture_coordinates,
             set()
         )
 
@@ -76,6 +76,6 @@ class TestPawn(TestCase):
         )
 
         self.assertEqual(
-            Pawn('d8', False).possible_capture_coordinates,
+            Pawn('d1', False).possible_capture_coordinates,
             set()
         )
