@@ -1,10 +1,17 @@
 from __future__ import annotations
-from pichess.utils import fen_to_matrix
+from pichess.utils import fen_to_matrix, generator_from_args
 from abc import ABC, abstractmethod
+from typing import Iterator
 
 
 class Engine:
-    pass
+    def __init__(self):
+        pass
+
+    def set_fen_position(self, fen) -> None:
+        '''set position from fen string'''
+
+        self.matrix = fen_to_matrix(fen)
 
 
 class Piece(ABC):
@@ -14,7 +21,7 @@ class Piece(ABC):
 
     @property
     @abstractmethod
-    def all_move_directions(self) -> set[tuple[int, int]]:
+    def all_move_directions(self) -> dict[Iterator[tuple[int, int]]]:
         '''
         return a set of (x, y) pair used to determine the moves
         that the piece can make from a relative position (0, 0)
@@ -25,14 +32,24 @@ class Piece(ABC):
 
     @property
     def possible_move_coordinates(self) -> set[str]:
-        '''return a set of possible move coordinates a piece can go to'''
+        '''return a set of possible move coordinates a piece can go to in an empty board'''
+
+        if not self.can_jump:
+            possible_move_directions = set()
+            all_move_directions = self.all_move_directions
+
+            for direction in all_move_directions.keys(): # loop through cardinal directions N, NE, E, SE...
+                for generated_direction in all_move_directions[direction]:
+                    possible_move_directions.add(generated_direction)
+
+        else:
+            possible_move_directions = self.all_move_directions
         
-        directions = self.all_move_directions
-        return self.coordinates_from_directions(self.coordinates, directions)
+        return self.coordinates_from_directions(self.coordinates, possible_move_directions)
 
     @property
     @abstractmethod
-    def all_capture_directions(self) -> set[tuple[int, int]]:
+    def all_capture_directions(self) -> dict[Iterator[tuple[int, int]]]:
         '''
         return a set of (x, y) pair used to determine the captures
         that the piece can make from a relative position (0, 0)
@@ -67,12 +84,19 @@ class Piece(ABC):
 
 
 class King(Piece):
+    can_jump = False
+
     @property
     def all_move_directions(self):
         return {
-            (-1,  1), (0,  1), (1,  1),
-            (-1,  0),          (1,  0),
-            (-1, -1), (0, -1), (1, -1)
+            'N': generator_from_args((0, 1)),
+            'NE': generator_from_args((1, 1)),
+            'E': generator_from_args((1, 0)),
+            'SE': generator_from_args((1, -1)),
+            'S': generator_from_args((0, -1)),
+            'SW': generator_from_args((-1, -1)),
+            'W': generator_from_args((-1, 0)),
+            'NW': generator_from_args((-1, 1))
         }
 
     @property
@@ -81,14 +105,16 @@ class King(Piece):
 
 
 class Queen(Piece):
+    can_jump = False
+
     @property
     def all_move_directions(self):
         bishop = Bishop(self.coordinates)
         rook = Rook(self.coordinates)
 
         return {
-            *rook.all_move_directions,
-            *bishop.all_move_directions
+            **rook.all_move_directions,
+            **bishop.all_move_directions
         }
 
     @property
@@ -97,13 +123,15 @@ class Queen(Piece):
 
 
 class Rook(Piece):
+    can_jump = False
+
     @property
     def all_move_directions(self):
         return {
-            *[(x, 0) for x in range(-8, 0)],
-            *[(x+1, 0) for x in range(8)],
-            *[(0, y) for y in range(-8, 0)],
-            *[(0, y+1) for y in range(8)]
+            'N': ((0, y+1) for y in range(8)),
+            'E': ((x+1, 0) for x in range(8)),
+            'S': ((0, y-1) for y in range(0, -8, -1)),
+            'W': ((x-1, 0) for x in range(0, -8, -1))
         }
     
     @property 
@@ -112,13 +140,15 @@ class Rook(Piece):
 
 
 class Bishop(Piece):
+    can_jump = False
+
     @property
     def all_move_directions(self):
         return {
-            *[(x, x) for x in range(-8, 0)],
-            *[(x+1, x+1) for x in range(8)],
-            *[(x, -x) for x in range(-8, 0)],
-            *[(x+1, -(x+1)) for x in range(8)]
+            'NE': ((x+1, x+1) for x in range(8)),
+            'SE': ((x+1, -(x+1)) for x in range(8)),
+            'SW': ((x-1, x-1) for x in range(0, -8, -1)),
+            'NW': ((x-1, -(x-1)) for x in range(0, -8, -1))
         }
     
     @property
@@ -127,6 +157,8 @@ class Bishop(Piece):
 
 
 class Knight(Piece):
+    can_jump = True
+
     @property
     def all_move_directions(self):
         return {
@@ -140,25 +172,27 @@ class Knight(Piece):
 
 
 class Pawn(Piece):
+    can_jump = False
+
     @property
     def all_move_directions(self):
         rank: int = int(self.coordinates[1])
 
         if self.color:
             if rank == 2:
-                return {(0, 1), (0, 2)}
+                return {'N': generator_from_args((0, 1), (0, 2))}
             elif rank == 8:
-                return set()
+                return dict()
             else:
-                return {(0, 1)}
+                return {'N': generator_from_args((0, 1))}
 
         else:
             if rank == 7:
-                return {(0, -1), (0, -2)}
+                return {'S': generator_from_args((0, -1), (0, -2))}
             elif rank == 1:
-                return set()
+                return dict()
             else:
-                return {(0, -1)}
+                return {'S': generator_from_args((0, -1))}
     
     @property
     def all_capture_directions(self):

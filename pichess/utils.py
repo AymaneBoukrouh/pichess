@@ -1,3 +1,5 @@
+from typing import Iterator, Any
+
 def fen_to_matrix(fen: str) -> dict[str, str]:
     '''convert fen to matrix'''
 
@@ -20,3 +22,10 @@ def fen_to_matrix(fen: str) -> dict[str, str]:
             x = chr(ord(x) + 1)            
 
     return matrix
+
+
+def generator_from_args(*args: Any) -> Iterator[Any]:
+    '''create a generator from *args'''
+
+    for arg in args:
+        yield arg
