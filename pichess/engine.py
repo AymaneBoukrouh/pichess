@@ -26,19 +26,9 @@ class Piece(ABC):
     @property
     def possible_move_coordinates(self) -> set[str]:
         '''return a set of possible move coordinates a piece can go to'''
-
-        current_file: str = self.coordinates[0]
-        current_rank: int = int(self.coordinates[1])
-
-        coordinates_set = set()
-        for (x, y) in self.all_move_directions:
-            file: str = chr(ord(current_file) + x)
-            rank: int = current_rank + y
-
-            if (1 <= rank <= 8) and (ord('a') <= ord(file) <= ord('h')):
-                coordinates_set.add(f'{file}{rank}')
         
-        return coordinates_set
+        directions = self.all_move_directions
+        return self.coordinates_from_directions(self.coordinates, directions)
 
     @property
     @abstractmethod
@@ -54,6 +44,26 @@ class Piece(ABC):
     @property
     def possible_capture_coordinates(self) -> set[str]:
         '''return a set of possible capture coordinates a piece can make'''
+
+        directions = self.all_capture_directions
+        return self.coordinates_from_directions(self.coordinates, directions)
+
+    @staticmethod
+    def coordinates_from_directions(coordinates:str, directions: set[tuple[int, int]]):
+        '''return set of coordinates from a set of directions from current coordinates'''
+
+        current_file: str = coordinates[0]
+        current_rank: int = int(coordinates[1])
+
+        coordinates_set = set()
+        for (x, y) in directions:
+            file: str = chr(ord(current_file) + x)
+            rank: int = current_rank + y
+
+            if (1 <= rank <= 8) and (ord('a') <= ord(file) <= ord('h')):
+                coordinates_set.add(f'{file}{rank}')
+        
+        return coordinates_set
 
 
 class King(Piece):
@@ -152,4 +162,16 @@ class Pawn(Piece):
     
     @property
     def all_capture_directions(self):
-        pass
+        rank: int = int(self.coordinates[1])
+
+        if self.color:
+            if rank != 8:
+                return {(-1, 1), (1, 1)}
+            else:
+                return set()
+        
+        else:
+            if rank != 1:
+                return {(-1, -1), (1, -1)}
+            else:
+                return set()
