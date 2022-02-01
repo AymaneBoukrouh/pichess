@@ -45,3 +45,37 @@ class TestPawn(TestCase):
             Pawn('b2', False).possible_move_coordinates,
             {'b1'}
         )
+
+    def test_possible_capture_coordinates(self):
+        # White Pawn
+        self.assertEqual(
+            Pawn('a2', True).possible_capture_coordinates,
+            {'b3'}
+        )
+
+        self.assertEqual(
+            Pawn('d4', True).possible_capture_coordinates,
+            {'c5', 'e5'}
+        )
+
+        self.assertEqual(
+            Pawn('f8', True).possible,
+            set()
+        )
+
+        # Black Pawn
+
+        self.assertEqual(
+            Pawn('h7', False).possible_capture_coordinates,
+            {'g6'}
+        )
+
+        self.assertEqual(
+            Pawn('f3', False).possible_capture_coordinates,
+            {'e2', 'g2'}
+        )
+
+        self.assertEqual(
+            Pawn('d8', False).possible_capture_coordinates,
+            set()
+        )
