@@ -33,19 +33,8 @@ class Piece(ABC):
     @property
     def possible_move_coordinates(self) -> set[str]:
         '''return a set of possible move coordinates a piece can go to in an empty board'''
-
-        if not self.can_jump:
-            possible_move_directions = set()
-            all_move_directions = self.all_move_directions
-
-            for direction in all_move_directions.keys(): # loop through cardinal directions N, NE, E, SE...
-                for generated_direction in all_move_directions[direction]:
-                    possible_move_directions.add(generated_direction)
-
-        else:
-            possible_move_directions = self.all_move_directions
         
-        return self.coordinates_from_directions(self.coordinates, possible_move_directions)
+        return self.directions_from_can_jump(self.all_move_directions)
 
     @property
     @abstractmethod
@@ -62,11 +51,20 @@ class Piece(ABC):
     def possible_capture_coordinates(self) -> set[str]:
         '''return a set of possible capture coordinates a piece can make'''
 
-        directions = self.all_capture_directions
-        return self.coordinates_from_directions(self.coordinates, directions)
+        return self.directions_from_can_jump(self.all_capture_directions)
+    
+    def directions_from_can_jump(self, directions: dict[Iterator[tuple[int, int]]]):
+        '''return directions depending on self.can_jump'''
+        
+        if not self.can_jump:
+            possible_directions = self.directions_from_generators(directions)
+        else:
+            possible_directions = directions
+        
+        return self.coordinates_from_directions(self.coordinates, possible_directions)
 
     @staticmethod
-    def coordinates_from_directions(coordinates:str, directions: set[tuple[int, int]]):
+    def coordinates_from_directions(coordinates:str, directions: set[tuple[int, int]]) -> set[str]:
         '''return set of coordinates from a set of directions from current coordinates'''
 
         current_file: str = coordinates[0]
@@ -81,6 +79,17 @@ class Piece(ABC):
                 coordinates_set.add(f'{file}{rank}')
         
         return coordinates_set
+
+    @staticmethod
+    def directions_from_generators(direction_generators: dict[Iterator[tuple[int, int]]]) -> set[tuple[int, int]]:
+        '''convert generators to a set of (x, y) directions'''
+
+        possible_move_directions = set()
+        for direction in direction_generators.keys(): # loop through cardinal directions N, NE, E, SE...
+            for generated_direction in direction_generators[direction]:
+                possible_move_directions.add(generated_direction)
+
+        return possible_move_directions
 
 
 class King(Piece):
@@ -200,12 +209,12 @@ class Pawn(Piece):
 
         if self.color:
             if rank != 8:
-                return {(-1, 1), (1, 1)}
+                return {'N': generator_from_args((-1, 1), (1, 1))}
             else:
-                return set()
+                return dict()
         
         else:
             if rank != 1:
-                return {(-1, -1), (1, -1)}
+                return {'S': generator_from_args((-1, -1), (1, -1))}
             else:
-                return set()
+                return dict()
