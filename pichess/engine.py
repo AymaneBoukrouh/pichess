@@ -52,6 +52,11 @@ class Piece(ABC):
         '''return a set of possible capture coordinates a piece can make'''
 
         return self.directions_from_can_jump(self.all_capture_directions)
+
+    def pseudolegal_coordinates(self, fen: str) -> set[str]:
+        '''return the coordinates of pseudolegal moves/captures of piece in a position'''
+
+        return set()
     
     def directions_from_can_jump(self, directions: dict[Iterator[tuple[int, int]]]):
         '''return directions depending on self.can_jump'''

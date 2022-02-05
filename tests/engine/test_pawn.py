@@ -1,5 +1,6 @@
 from pichess.engine import Pawn
 from unittest import TestCase
+from tests.engine.utils import load_fen
 
 
 class TestPawn(TestCase):
@@ -79,3 +80,20 @@ class TestPawn(TestCase):
             Pawn('d1', False).possible_capture_coordinates,
             set()
         )
+
+    def test_pseudolegal_coordinates(self):
+        fen = load_fen('pseudolegal_coordinates')
+
+        # coordinates, color, fen, pseudolegal_coordinates
+        data = [
+            ['b2', True, fen['1'], {'b3', 'b4'}],
+            ['e4', True, fen['1'], {'e5'}],
+            ['h4', True, fen['1'], set()],
+            ['f4', True, fen['2'], {'e5', 'f5'}]
+        ]
+
+        for coordinates, color, fen, pseudolegal_coordinates in data:
+            self.assertEqual(
+                Pawn(coordinates, color).pseudolegal_coordinates(fen),
+                pseudolegal_coordinates
+            )
