@@ -27,7 +27,7 @@ class TestKnight(TestCase):
         data = [
             ['c3', True, fen['1'], {'a2', 'a4', 'b1', 'b5', 'd5', 'e2'}],
             ['c3', True, fen['5'], {'a4', 'b1', 'd5', 'e2'}],
-            ['f3', True, fen['7'], {'d2', 'd4', 'e1', 'e5', 'h2', 'g4'}],
+            ['f3', True, fen['7'], {'d2', 'd4', 'e1', 'e5', 'h2', 'h4'}],
             ['f1', True, fen['9'], {'d2', 'e3', 'g3'}],
             ['g8', False, fen['4'], {'e7', 'f6', 'h6'}],
             ['f4', False, fen['6'], {'d3', 'd5', 'e2', 'e6', 'g2', 'g6', 'h3', 'h5'}],
