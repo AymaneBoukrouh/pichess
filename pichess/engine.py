@@ -2,6 +2,7 @@ from __future__ import annotations
 from pichess.utils import fen_to_matrix, generator_from_args
 from abc import ABC, abstractmethod
 from typing import Iterator
+from enum import Enum
 
 
 class Engine:
@@ -14,10 +15,15 @@ class Engine:
         self.matrix = fen_to_matrix(fen)
 
 
+class Color(Enum):
+    WHITE = 1
+    BLACK = 0
+
+
 class Piece(ABC):
-    def __init__(self, coordinates: str=None, color: bool=True):
+    def __init__(self, coordinates: str=None, color: Color=Color.WHITE):
         self.coordinates = coordinates
-        self.color = color # True -> white, False -> black
+        self.color = color
 
     @property
     @abstractmethod
@@ -34,7 +40,7 @@ class Piece(ABC):
     def possible_move_coordinates(self) -> set[str]:
         '''return a set of possible move coordinates a piece can go to in an empty board'''
         
-        return self.directions_from_can_jump(self.all_move_directions)
+        return self.directions_by_can_jump(self.all_move_directions)
 
     @property
     @abstractmethod
@@ -51,14 +57,89 @@ class Piece(ABC):
     def possible_capture_coordinates(self) -> set[str]:
         '''return a set of possible capture coordinates a piece can make'''
 
-        return self.directions_from_can_jump(self.all_capture_directions)
+        return self.directions_by_can_jump(self.all_capture_directions)
 
     def pseudolegal_coordinates(self, fen: str) -> set[str]:
         '''return the coordinates of pseudolegal moves/captures of piece in a position'''
 
-        return set()
-    
-    def directions_from_can_jump(self, directions: dict[Iterator[tuple[int, int]]]):
+        matrix = fen_to_matrix(fen)
+        coordinates_set = set()
+
+        current_file: str = self.coordinates[0]
+        current_rank: int = int(self.coordinates[1])
+
+        if self.can_jump:
+            for coordinates in {*self.possible_move_coordinates, *self.possible_capture_coordinates}:
+                if not matrix[coordinates]:
+                    coordinates_set.add(coordinates)
+
+                elif self.color and matrix[coordinates] in list('kqrbnp'):
+                    coordinates_set.add(coordinates)
+
+                elif not self.color and matrix[coordinates] in list('KQRBNP'):
+                    coordinates_set.add(coordinates)
+
+        else:
+            pseudolegal_move_coordinates = self.pseudolegal_move_coordinates(matrix)
+            coordinates_set.update(pseudolegal_move_coordinates)
+
+            pseudolegal_capture_coordinates = self.pseudolegal_capture_coordinates(matrix)
+            coordinates_set.update(pseudolegal_capture_coordinates)
+
+        return coordinates_set
+
+    def pseudolegal_move_coordinates(self, matrix: dict[str, str]) -> set[str]:
+        '''return the coordinates of pseudolegal moves of piece in a position'''
+
+        coordinates_set = set()
+        for direction in self.all_move_directions:
+            for x, y in self.all_move_directions[direction]:
+                coordinates = self.coordinates_from_xy(x, y)
+
+                try:
+                    if not matrix[coordinates]:
+                        coordinates_set.add(coordinates)
+                    else: # piece exists on that square
+                        break
+                    
+                except KeyError: # coordinates outside the board
+                    break
+
+        return coordinates_set
+
+    def pseudolegal_capture_coordinates(self, matrix: dict[str, str]) -> set[str]:
+        '''return the coordinates of pseudolegal captures of piece in a position'''
+
+        coordinates_set = set()
+        for direction in self.all_capture_directions:
+            for x, y in self.all_capture_directions[direction]:
+                coordinates = self.coordinates_from_xy(x, y)
+
+                try:
+                    if (self.color and matrix[coordinates] in list('kqrbnp')) or (not self.color and matrix[coordinates] in list('KQRBNP')):
+                        coordinates_set.add(coordinates)
+                        break
+
+                    elif matrix[coordinates]: # don't break if square is empty
+                        break
+                
+                except KeyError: # coordinates outside the board
+                    break
+            
+        return coordinates_set
+
+    def coordinates_from_xy(self, x: int, y: int) -> str:
+        '''convert (x, y) pair to coordinates'''
+
+        current_file: str = self.coordinates[0]
+        current_rank: int = int(self.coordinates[1])
+
+        file: str = chr(ord(current_file) + x)
+        rank: int = current_rank + y
+
+        return f'{file}{rank}'
+
+    def directions_by_can_jump(self, directions: dict[Iterator[tuple[int, int]]]):
         '''return directions depending on self.can_jump'''
         
         if not self.can_jump:
@@ -70,13 +151,13 @@ class Piece(ABC):
 
     @staticmethod
     def coordinates_from_directions(coordinates:str, directions: set[tuple[int, int]]) -> set[str]:
-        '''return set of coordinates from a set of directions from current coordinates'''
+        '''return set of coordinates from a set of (x, y) pairs'''
 
         current_file: str = coordinates[0]
         current_rank: int = int(coordinates[1])
 
         coordinates_set = set()
-        for (x, y) in directions:
+        for x, y in directions:
             file: str = chr(ord(current_file) + x)
             rank: int = current_rank + y
 
@@ -87,7 +168,7 @@ class Piece(ABC):
 
     @staticmethod
     def directions_from_generators(direction_generators: dict[Iterator[tuple[int, int]]]) -> set[tuple[int, int]]:
-        '''convert generators to a set of (x, y) directions'''
+        '''convert generators to a set of (x, y) pairs'''
 
         possible_move_directions = set()
         for direction in direction_generators.keys(): # loop through cardinal directions N, NE, E, SE...
