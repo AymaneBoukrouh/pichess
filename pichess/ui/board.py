@@ -1,12 +1,11 @@
-from pichess.square import Square
-from pichess.pieces import Piece
+from pichess.ui.square import Square
+from pichess.ui.pieces import Piece
 from pichess.utils import fen_to_matrix
-
 from PyQt6.QtWidgets import QWidget
 
 
 class Board(QWidget):
-    styles = 'pichess/assets/styles/board.css'
+    styles = 'pichess/ui/assets/styles/board.css'
 
     def __init__(self, parent: QWidget) -> None:
         QWidget.__init__(self, parent)

@@ -1,6 +1,6 @@
-from pichess.engine import Bishop
-from unittest import TestCase
 from tests.engine.utils import load_fen
+from pichess.engine.pieces import Bishop
+from unittest import TestCase
 
 
 class TestBishop(TestCase):

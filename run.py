@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-from pichess.mainwindow import MainWindow
+from pichess.ui.mainwindow import MainWindow
 from PyQt6.QtWidgets import QApplication
 import sys
 

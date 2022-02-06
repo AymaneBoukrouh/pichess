@@ -1,4 +1,11 @@
 from typing import Iterator, Any
+from enum import Enum
+
+
+class Color(Enum):
+    WHITE = 1
+    BLACK = 0
+
 
 def fen_to_matrix(fen: str) -> dict[str, str]:
     '''convert fen to matrix'''

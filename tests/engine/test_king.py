@@ -1,6 +1,6 @@
-from pichess.engine import King
-from unittest import TestCase
 from tests.engine.utils import load_fen
+from pichess.engine.pieces import King
+from unittest import TestCase
 
 
 class TestKing(TestCase):

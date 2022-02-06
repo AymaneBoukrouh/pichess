@@ -13,7 +13,7 @@ class Piece(QSvgWidget):
         self.resize(100, 100)
 
         self.set_coordinates(coordinates)
-        self.load(f'pichess/assets/svg/pieces/{self.letter}.svg')
+        self.load(f'pichess/ui/assets/svg/pieces/{self.letter}.svg')
 
         if shadow:
             self.make_shadow()

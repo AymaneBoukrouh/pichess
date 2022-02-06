@@ -1,10 +1,9 @@
-from pichess.board import Board
-
+from pichess.ui.board import Board
 from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout
 
 
 class MainWindow(QMainWindow):
-    styles = 'pichess/assets/styles/mainwindow.css'
+    styles = 'pichess/ui/assets/styles/mainwindow.css'
 
     def __init__(self) -> None:
         QMainWindow.__init__(self)

@@ -1,6 +1,6 @@
-from pichess.engine import Queen, Rook, Bishop
-from unittest import TestCase
 from tests.engine.utils import load_fen
+from pichess.engine.pieces import Queen, Rook, Bishop
+from unittest import TestCase
 
 
 class TestQueen(TestCase):

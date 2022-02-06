@@ -1,23 +1,7 @@
-from __future__ import annotations
+from pichess.utils import Color
 from pichess.utils import fen_to_matrix, generator_from_args
 from abc import ABC, abstractmethod
 from typing import Iterator
-from enum import Enum
-
-
-class Engine:
-    def __init__(self):
-        pass
-
-    def set_fen_position(self, fen) -> None:
-        '''set position from fen string'''
-
-        self.matrix = fen_to_matrix(fen)
-
-
-class Color(Enum):
-    WHITE = 1
-    BLACK = 0
 
 
 class Piece(ABC):

@@ -1,6 +1,6 @@
-from pichess.engine import Rook
-from unittest import TestCase
 from tests.engine.utils import load_fen
+from pichess.engine.pieces import Rook
+from unittest import TestCase
 
 
 class TestRook(TestCase):
