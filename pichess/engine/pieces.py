@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pichess.utils import Color
 from pichess.utils import fen_to_matrix, generator_from_args
 from abc import ABC, abstractmethod
@@ -8,6 +9,22 @@ class Piece(ABC):
     def __init__(self, coordinates: str=None, color: Color=Color.WHITE):
         self.coordinates = coordinates
         self.color = color
+
+    @staticmethod
+    def from_letter(letter, coordinates) -> Piece:
+        '''initiate piece from letter, returns appropriate piece object'''
+
+        color = ('A' <= letter <= 'Z') # True -> white, False -> black
+
+        match letter:
+            case 'K' | 'k': PieceType = King
+            case 'Q' | 'q': PieceType = Queen
+            case 'R' | 'r': PieceType = Rook
+            case 'B' | 'b': PieceType = Bishop
+            case 'N' | 'n': PieceType = Knight
+            case 'P' | 'p': PieceType = Pawn
+
+        return PieceType(coordinates, color)
 
     @property
     @abstractmethod
